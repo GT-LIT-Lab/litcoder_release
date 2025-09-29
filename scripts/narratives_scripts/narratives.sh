@@ -1,0 +1,44 @@
+#!/bin/bash
+
+# Set up directories
+CACHE_DIR="cache_narratives2"
+DATA_DIR="data/narratives/neural_data"
+
+SUBJECTS=(
+    "sub-244" "sub-249" "sub-254" "sub-255" "sub-256" "sub-257" "sub-258" "sub-259"
+    "sub-260" "sub-261" "sub-263" "sub-264" "sub-265" "sub-266" "sub-267"
+    "sub-268" "sub-269"
+)
+
+# Activate conda environment
+conda activate litcoder
+
+for LAYER_IDX in {0..11}; do
+    echo "Processing layer: $LAYER_IDX"
+    
+    # Loop over all subjects
+    for SUBJECT in "${SUBJECTS[@]}"; do
+        echo "  Subject: $SUBJECT"
+        
+        python ../../train_narratives.py \
+            --data_dir $DATA_DIR \
+            --subject $SUBJECT \
+            --model_name gpt2-small \
+            --layer_idx $LAYER_IDX \
+            --last_token \
+            --folding_type kfold_trimmed \
+            --chunk_length 20 \
+            --singcutoff 1e-10 \
+            --downsample_method lanczos \
+            --lanczos_cutoff_mult 1.0 \
+            --lanczos_window 3 \
+            --lookback 256 \
+            --cache_dir $CACHE_DIR \
+            --normalize_features \
+            --normalize_targets \
+            --ndelays 8 \
+            --tr 1.5 \
+            --context_type fullcontext \
+            --wandb_project_name "litcoderpublic_narratives_test_language_models"
+    done
+done
