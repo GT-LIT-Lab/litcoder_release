@@ -187,5 +187,4 @@ cython_debug/
 .pypirc
 
 # data
-neural_data/
 outputs/
